@@ -65,7 +65,7 @@ class SurveyBot:
             logging.error(f"NoSuchElementException: Element not found with {locator} = {selector}.")
             return None
 
-    def _click_button(self, element: WebElement) -> None:
+    def _click_element(self, element: WebElement) -> None:
         if element:
             try:
                 element.click()
@@ -74,25 +74,25 @@ class SurveyBot:
         else:
             logging.error("Could not click on the element")
 
-    def click_cookies(self, element: str) -> bool:
-        radio_button = self._find_element(*self.web_elements[element])
-        self._click_button(radio_button)
-        time.sleep(1)
+    def _click_action(self, element_key: str, sleep_time: int = 1) -> bool:
+        element = self._find_element(*self.web_elements[element_key])
+        self._click_element(element)
+        time.sleep(sleep_time)
         return True
 
-    def click_login(self, element: str) -> bool:
-        accept_survey = self._find_element(*self.web_elements[element])
-        self._click_button(accept_survey)
-        time.sleep(5)
-        return True
+    def accept_cookies(self, element_key: str) -> bool:
+        return self._click_action(element_key)
+
+    def click_login(self, element_kew: str) -> bool:
+        return self._click_action(element_kew, sleep_time=5)
 
     def run(self, cookies: str, login: str):
         self.driver.implicitly_wait(time_to_wait=self.wait_time)
         try:
             self.driver.get(self.url)
-            self.click_cookies(cookies)
+            self.accept_cookies(cookies)
             self.click_login(login)
-            print("Login button clicked.")
+            logging.info("Login button clicked.")
         finally:
             self.driver.quit()
 
