@@ -12,22 +12,22 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 import config as config
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+WEB_ELEMENT = Dict[
+    str,
+    Tuple[
+        Union[EC.visibility_of_element_located, EC.element_to_be_clickable],
+        By,
+        str,
+    ],
+]
 
 
 class SurveyBot:
-    def __init__(
-        self,
-        url: str,
-        web_elements: Dict[
-            str,
-            Tuple[
-                Union[EC.visibility_of_element_located, EC.element_to_be_clickable],
-                By,
-                str,
-            ],
-        ],
-    ):
+    def __init__(self, url: str, web_elements: WEB_ELEMENT):
         self.url = url
         self.wait_time: int = 5
         self.driver = self.setup_driver()
@@ -51,7 +51,11 @@ class SurveyBot:
     ) -> WebElement:
         try:
             wait = WebDriverWait(
-                driver=(element_to_wait_for if element_to_wait_for is not None else self.driver),
+                driver=(
+                    element_to_wait_for
+                    if element_to_wait_for is not None
+                    else self.driver
+                ),
                 timeout=self.wait_time,
             )
             element = wait.until(condition((locator, selector)))
@@ -62,7 +66,9 @@ class SurveyBot:
             )
             return None
         except NoSuchElementException:
-            logging.error(f"NoSuchElementException: Element not found with {locator} = {selector}.")
+            logging.error(
+                f"NoSuchElementException: Element not found with {locator} = {selector}."
+            )
             return None
 
     def _click_element(self, element: WebElement) -> None:
